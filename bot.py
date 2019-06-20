@@ -1,8 +1,9 @@
-from config import *
+from config import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_KEY, ACCESS_SECRET
 import tweepy
 import firebase_admin
 import json
 import time
+from image import *
 from firebase_admin import credentials, db
 
 cred = credentials.Certificate("key.json")  # firebase_admin SDK
@@ -33,13 +34,25 @@ def bot():
     last_id = get_last_id()
     mentions = api.mentions_timeline(last_id['last_seen_id'])
     for mention in reversed(mentions):
-        print(mention.id_str+" - " + mention.text)
-        if(mention.in_reply_to_status_id):
+        uname = mention.user.screen_name
+        print(mention.id_str+" - " + '@' + uname)
+        if(mention.in_reply_to_status_id and '@quoteitbot' in mention.text.lower()):
             mainStatus = get_status(mention.in_reply_to_status_id_str)
-            print('aku disebut')
+            print(mainStatus.text)
+
+            status = mainStatus.text
+            img = get_image()
+            upload(img)
+            generate(status, '@' + uname)
+            media_ids = api.media_upload('temp.jpg')
+            print(media_ids.media_id)
+            try:
+                api.update_status(status='@' + uname
+                                  + ' nyoh', media_ids=[media_ids.media_id],
+                                  in_reply_to_status_id=mention.id)
+            except tweepy.error.TweepError as error:
+                print('Unknown error', error)
             store_last_id(mention.id)
-            api.update_status('@' + mention.user.screen_name
-                              + ' ' + mainStatus.text + " jancok", mention.id)
 
 
 while True:
