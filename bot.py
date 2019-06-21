@@ -41,8 +41,8 @@ def debug(data):
     ref.push(data)
 
 
-def check(screen_name):
-    if (screen_name == 'Quoteitbot'):
+def check(status):
+    if (status.user.screen_name == 'Quoteitbot' or not('#quoteit' in status.text)):
         return False
     else:
         return True
@@ -50,6 +50,7 @@ def check(screen_name):
 
 def bot():
     try:
+        print("get mention")
         last_id = get_last_id()
         mentions = api.mentions_timeline(last_id['last_seen_id'])
         for mention in reversed(mentions):
@@ -75,6 +76,8 @@ def bot():
                                           in_reply_to_status_id=mention.id)
                     except Exception as e:
                         print("    error: " + str(e))
+                else:
+                    print("No hashtag")
                 store_last_id(mention.id)
     except Exception as e:
         print("    error: " + str(e))
