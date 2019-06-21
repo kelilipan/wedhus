@@ -61,7 +61,7 @@ def bot():
             generate(status,  uname)
             media_ids = api.media_upload('temp.jpg')
             try:
-                api.update_status(status=uname
+                api.update_status(status='@'+mention.user.screen_name
                                   + desc, media_ids=[media_ids.media_id],
                                   in_reply_to_status_id=mention.id)
             except tweepy.error.TweepError as error:
