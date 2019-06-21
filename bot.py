@@ -42,10 +42,10 @@ def debug(data):
 
 
 def check(status):
-    if (status.user.screen_name == 'Quoteitbot' or not('#quoteit' in status.text)):
-        return False
-    else:
+    if('#quoteit' in status.text.lower()):
         return True
+    else:
+        return False
 
 
 def bot():
