@@ -24,9 +24,8 @@ def clear_temp():
     cloudinary.api.delete_resources(["temp"])
 
 
-def upload(obj):
+def upload(image):
     clear_temp()
-    image = json.loads(obj)
     image_link = image['links']['download_location']
     js = json.loads(urllib.request.urlopen(image_link).read())
     link = js['url']
@@ -46,7 +45,7 @@ def generate(quote,  user):
         {'width': 800,
          'overlay': {
              'font_family': "Times",
-             'font_size': 45,
+             'font_size': 60,
              'font_weight': "bold",
              'text_align': "center",
              'text': quote},
@@ -55,7 +54,7 @@ def generate(quote,  user):
         {'overlay':
          {'font_family': "yellowtail",
           'font_size': 35,
-          'font_weight': "bold",
+          #   'font_weight': "bold",
           'text': user},
          'color': 'white',
          'gravity': "south",
@@ -70,4 +69,5 @@ def generate(quote,  user):
 
 # clear_temp()
 # upload()
-generate("asnjdnaksjdnasndjkasnjkdnjkasndjknas", '@raisoturu')
+# generate("asnjdnaksjdnasndjkasnjkdnjkasndjknas", '@raisoturu')
+# img = json.loads(get_image())

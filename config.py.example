@@ -1,4 +1,15 @@
+
+#firebase
 CONSUMER_KEY = 'AAA'
 CONSUMER_SECRET = 'BBB'
 ACCESS_KEY = 'CCC'
 ACCESS_SECRET = 'XXXXXXXXXX'
+
+#unsplash
+UNSPLASH_KEY = 'xxx'
+UNSPLASH_SECRET = 'xxx'
+
+#cloudinary
+cloud_name = 'xxx'
+api_key = 'xxxx'
+api_secret = 'xxxx-xxxx'

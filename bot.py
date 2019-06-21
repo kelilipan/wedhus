@@ -3,7 +3,8 @@ import tweepy
 import firebase_admin
 import json
 import time
-from image import *
+from image import generate, upload, get_image
+import re
 from firebase_admin import credentials, db
 
 cred = credentials.Certificate("key.json")  # firebase_admin SDK
@@ -22,6 +23,11 @@ def store_last_id(id):
     })
 
 
+def remove_media(text):
+    a = re.sub(r'https?:\/\/.*[\r\n]*', '', text)
+    return a
+
+
 def get_last_id():
     return ref.get()
 
@@ -30,25 +36,33 @@ def get_status(id):
     return api.get_status(id)
 
 
+def debug(data):
+    ref = db.reference('/logs')
+    ref.push(data)
+
+
 def bot():
     last_id = get_last_id()
     mentions = api.mentions_timeline(last_id['last_seen_id'])
     for mention in reversed(mentions):
-        uname = mention.user.screen_name
-        print(mention.id_str+" - " + '@' + uname)
-        if(mention.in_reply_to_status_id and '@quoteitbot' in mention.text.lower()):
+        uname = '@' + str(mention.in_reply_to_screen_name)
+        print('=============================================')
+        print(mention.id_str+" - " + uname)
+        # debug(mention._json)
+        if(mention.in_reply_to_status_id):
             mainStatus = get_status(mention.in_reply_to_status_id_str)
             print(mainStatus.text)
-
-            status = mainStatus.text
-            img = get_image()
+            status = remove_media(mainStatus.text)
+            img = json.loads(get_image())
+            desc = ' by ' + img['user']['username'] + \
+                ' unsplash ' + img['links']['html']
+            print(desc)
             upload(img)
-            generate(status, '@' + uname)
+            generate(status,  uname)
             media_ids = api.media_upload('temp.jpg')
-            print(media_ids.media_id)
             try:
-                api.update_status(status='@' + uname
-                                  + ' nyoh', media_ids=[media_ids.media_id],
+                api.update_status(status=uname
+                                  + desc, media_ids=[media_ids.media_id],
                                   in_reply_to_status_id=mention.id)
             except tweepy.error.TweepError as error:
                 print('Unknown error', error)
