@@ -41,6 +41,13 @@ def debug(data):
     ref.push(data)
 
 
+def check(screen_name):
+    if (screen_name == 'Quoteitbot'):
+        return False
+    else:
+        return True
+
+
 def bot():
     last_id = get_last_id()
     mentions = api.mentions_timeline(last_id['last_seen_id'])
@@ -51,21 +58,31 @@ def bot():
         # debug(mention._json)
         if(mention.in_reply_to_status_id):
             mainStatus = get_status(mention.in_reply_to_status_id_str)
-            print(mainStatus.text)
-            status = remove_media(mainStatus.text)
-            img = json.loads(get_image())
-            desc = ' by ' + img['user']['username'] + \
-                ' unsplash ' + img['links']['html']
-            print(desc)
-            upload(img)
-            generate(status,  uname)
-            media_ids = api.media_upload('temp.jpg')
-            try:
-                api.update_status(status='@'+mention.user.screen_name
-                                  + desc, media_ids=[media_ids.media_id],
-                                  in_reply_to_status_id=mention.id)
-            except tweepy.error.TweepError as error:
-                print('Unknown error', error)
+            if(check(mainStatus)):
+                print(mainStatus.text)
+                status = remove_media(mainStatus.text)
+                img = json.loads(get_image())
+                desc = ' by ' + img['user']['username'] + \
+                    ' unsplash ' + img['links']['html']
+                print(desc)
+                try:
+                    upload(img)
+                except:
+                    print('failed to upload image')
+                try:
+                    generate(status,  uname)
+                except:
+                    print("error generate image")
+                try:
+                    media_ids = api.media_upload('temp.jpg')
+                except:
+                    print("Failed to upload media")
+                try:
+                    api.update_status(status='@'+mention.user.screen_name
+                                      + desc, media_ids=[media_ids.media_id],
+                                      in_reply_to_status_id=mention.id)
+                except tweepy.error.TweepError as error:
+                    print('Unknown error', error)
             store_last_id(mention.id)
 
 
