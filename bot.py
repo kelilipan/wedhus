@@ -49,41 +49,35 @@ def check(screen_name):
 
 
 def bot():
-    last_id = get_last_id()
-    mentions = api.mentions_timeline(last_id['last_seen_id'])
-    for mention in reversed(mentions):
-        uname = '@' + str(mention.in_reply_to_screen_name)
-        print('=============================================')
-        print(mention.id_str+" - " + uname)
-        # debug(mention._json)
-        if(mention.in_reply_to_status_id):
-            mainStatus = get_status(mention.in_reply_to_status_id_str)
-            if(check(mainStatus)):
-                print(mainStatus.text)
-                status = remove_media(mainStatus.text)
-                img = json.loads(get_image())
-                desc = ' by ' + img['user']['username'] + \
-                    ' unsplash ' + img['links']['html']
-                print(desc)
-                try:
-                    upload(img)
-                except:
-                    print('failed to upload image')
-                try:
-                    generate(status,  uname)
-                except:
-                    print("error generate image")
-                try:
-                    media_ids = api.media_upload('temp.jpg')
-                except:
-                    print("Failed to upload media")
-                try:
-                    api.update_status(status='@'+mention.user.screen_name
-                                      + desc, media_ids=[media_ids.media_id],
-                                      in_reply_to_status_id=mention.id)
-                except tweepy.error.TweepError as error:
-                    print('Unknown error', error)
-            store_last_id(mention.id)
+    try:
+        last_id = get_last_id()
+        mentions = api.mentions_timeline(last_id['last_seen_id'])
+        for mention in reversed(mentions):
+            uname = '@' + str(mention.in_reply_to_screen_name)
+            print('=============================================')
+            print(mention.id_str+" - " + uname)
+            # debug(mention._json)
+            if(mention.in_reply_to_status_id):
+                mainStatus = get_status(mention.in_reply_to_status_id_str)
+                if(check(mainStatus)):
+                    print(mainStatus.text)
+                    status = remove_media(mainStatus.text)
+                    img = json.loads(get_image())
+                    desc = ' by ' + img['user']['username'] + \
+                        ' unsplash ' + img['links']['html']
+                    print(desc)
+                    try:
+                        upload(img)
+                        generate(status,  uname)
+                        media_ids = api.media_upload('temp.jpg')
+                        api.update_status(status='@'+mention.user.screen_name
+                                          + desc, media_ids=[media_ids.media_id],
+                                          in_reply_to_status_id=mention.id)
+                    except Exception as e:
+                        print("    error: " + str(e))
+                store_last_id(mention.id)
+    except Exception as e:
+        print("    error: " + str(e))
 
 
 while True:
