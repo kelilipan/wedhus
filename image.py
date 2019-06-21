@@ -1,4 +1,3 @@
-import pyunsplash
 import urllib.request
 import cloudinary.uploader
 import json
