@@ -60,7 +60,7 @@ def bot():
             # debug(mention._json)
             if(mention.in_reply_to_status_id):
                 mainStatus = get_status(mention.in_reply_to_status_id_str)
-                if(check(mainStatus)):
+                if(check(mention)):
                     print(mainStatus.text)
                     status = remove_media(mainStatus.text)
                     img = json.loads(get_image())
