@@ -1,3 +1,3 @@
 # wedhus
 
-Generate quote image from tweet
+Quote tweet bot
