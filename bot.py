@@ -25,7 +25,17 @@ def store_last_id(id):
 
 def remove_media(text):
     a = re.sub(r'https?:\/\/.*[\r\n]*', '', text)
-    return a
+    return a.strip()
+
+
+def remove_mention(text):
+    temp = text.split()
+    for i in range(len(temp)):
+        if temp[i][0] != "@":
+            break
+        else:
+            temp[i] = ""
+    return (' '.join(temp).strip())
 
 
 def get_last_id():
@@ -33,7 +43,7 @@ def get_last_id():
 
 
 def get_status(id):
-    return api.get_status(id)
+    return api.get_status(id, tweet_mode='extended')
 
 
 def debug(data):
@@ -49,38 +59,38 @@ def check(status):
 
 
 def bot():
-    try:
-        print("get mention")
-        last_id = get_last_id()
-        mentions = api.mentions_timeline(last_id['last_seen_id'])
-        for mention in reversed(mentions):
-            uname = '@' + str(mention.in_reply_to_screen_name)
-            print('=============================================')
-            print(mention.id_str+" - " + uname)
-            # debug(mention._json)
-            if(mention.in_reply_to_status_id):
-                mainStatus = get_status(mention.in_reply_to_status_id_str)
-                if(check(mention)):
-                    print(mainStatus.text)
-                    status = remove_media(mainStatus.text)
-                    img = json.loads(get_image())
-                    desc = ' by ' + img['user']['username'] + \
-                        ' unsplash ' + img['links']['html']
-                    print(desc)
-                    try:
-                        upload(img)
-                        generate(status,  uname)
-                        media_ids = api.media_upload('temp.jpg')
-                        api.update_status(status='@'+mention.user.screen_name
-                                          + desc, media_ids=[media_ids.media_id],
-                                          in_reply_to_status_id=mention.id)
-                    except Exception as e:
-                        print("    error: " + str(e))
-                else:
-                    print("No hashtag")
-                store_last_id(mention.id)
-    except Exception as e:
-        print("    error: " + str(e))
+    print("get mention")
+    last_id = get_last_id()
+    mentions = api.mentions_timeline(last_id['last_seen_id'])
+    for mention in reversed(mentions):
+        uname = '@' + str(mention.in_reply_to_screen_name)
+        print('=============================================')
+        print(mention.id_str+" - " + uname)
+        # debug(mention._json)
+        if(mention.in_reply_to_status_id):
+            mainStatus = get_status(mention.in_reply_to_status_id_str)
+            if(check(mention)):
+                print(mainStatus.full_text)
+                status = remove_mention(
+                    remove_media(mainStatus.full_text))
+                img = json.loads(get_image())
+                desc = ' by ' + img['user']['username'] + \
+                    ' unsplash ' + img['links']['html']
+                print(desc)
+                try:
+                    upload(img)
+                    generate(status,  uname)
+                    media_ids = api.media_upload('temp.jpg')
+                    api.update_status(status='@'+mention.user.screen_name
+                                      + desc, media_ids=[media_ids.media_id],
+                                      in_reply_to_status_id=mention.id)
+                except Exception as e:
+                    print("------error: " + str(e))
+                    store_last_id(mention.id)
+            else:
+                print("No hashtag")
+            store_last_id(mention.id)
+    print('=============================================')
 
 
 while True:

@@ -44,7 +44,7 @@ def generate(quote,  user):
         {'width': 800,
          'overlay': {
              'font_family': "Times",
-             'font_size': 60,
+             'font_size': 58,
              'font_weight': "bold",
              'text_align': "center",
              'text': quote},
