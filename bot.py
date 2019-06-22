@@ -24,8 +24,9 @@ def store_last_id(id):
 
 
 def remove_media(text):
+    # also remove an unicode char
     a = re.sub(r'https?:\/\/.*[\r\n]*', '', text)
-    return a.strip()
+    return a.replace('\u2800', '').strip()
 
 
 def remove_mention(text):
