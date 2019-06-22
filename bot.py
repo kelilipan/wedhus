@@ -30,7 +30,7 @@ def remove_media(text):
 
 
 def remove_mention(text):
-    temp = text.split()
+    temp = text.splitlines(True)
     for i in range(len(temp)):
         if temp[i][0] != "@":
             break
