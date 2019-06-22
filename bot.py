@@ -65,7 +65,7 @@ def bot():
     for mention in reversed(mentions):
         uname = '@' + str(mention.in_reply_to_screen_name)
         print('=============================================')
-        print(mention.id_str+" - " + uname)
+        print(mention.in_reply_to_status_id_str+" - " + uname)
         # debug(mention._json)
         if(mention.in_reply_to_status_id):
             mainStatus = get_status(mention.in_reply_to_status_id_str)
