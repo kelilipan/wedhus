@@ -37,14 +37,14 @@ def upload(image):
 
 def generate(quote,  user):
     option = [
-        {'width': 1024, 'height': 1024, 'crop': "fill"},
+        {'width': 1080, 'height': 1080, 'crop': "fill"},
         {
             "effect": {'blur': 300}
         },
-        {'width': 800,
+        {'width': 900,
          'overlay': {
              'font_family': "Times",
-             'font_size': 58,
+             'font_size': 55,
              'font_weight': "bold",
              'text_align': "center",
              'text': quote},
