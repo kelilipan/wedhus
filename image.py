@@ -1,4 +1,5 @@
 import urllib.request
+import urllib.parse
 import cloudinary.uploader
 import json
 from config import UNSPLASH_KEY, cloud_name, api_key, api_secret
@@ -62,6 +63,8 @@ def generate(quote,  user):
     curl = cloudinary.utils.cloudinary_url
     edit = curl('temp',
                 transformation=option)
+#    parsed_url = urllib.parse.quote(edit[0])
+    print(edit)
     urllib.request.urlretrieve(edit[0], 'temp.jpg')
     return(edit[0])
 

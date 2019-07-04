@@ -19,7 +19,7 @@ api = tweepy.API(auth, wait_on_rate_limit=True)
 
 def store_last_id(id):
     ref.set({
-        'last_seen_id': id
+        'last_seen_id': str(id)
     })
 
 
@@ -29,15 +29,14 @@ def remove_media(text):
     return a.replace('\u2800', '').strip()
 
 
-def remove_mention(text):
-    temp = text.splitlines(True)
-    for i in range(len(temp)):
-        if temp[i][0] != "@":
-            break
-        else:
-            temp[i] = ""
-    return (' '.join(temp).strip())
-
+def remove_mention(text,n):
+    temp = text.partition(' ')[2]    
+    if n > 0:
+        for i in range(n):
+            temp = temp.partition(' ')[2]
+        return temp
+    else:
+        return text
 
 def get_last_id():
     return ref.get()
@@ -64,19 +63,24 @@ def bot():
     last_id = get_last_id()
     mentions = api.mentions_timeline(last_id['last_seen_id'])
     for mention in reversed(mentions):
-        uname = '@' + str(mention.in_reply_to_screen_name)
-        print('=============================================')
-        print(mention.in_reply_to_status_id_str+" - " + uname)
+        try:
+            uname = '@' + str(mention.in_reply_to_screen_name)
+            print('=============================================')
+            print(mention.in_reply_to_status_id_str+" - " + uname)
+        except TypeError as e:
+            print("Unknown username",e)
+            uname = "@uknown"
         # debug(mention._json)
         if(mention.in_reply_to_status_id):
             mainStatus = get_status(mention.in_reply_to_status_id_str)
             if(check(mention)):
                 print(mainStatus.full_text)
                 status = remove_mention(
-                    remove_media(mainStatus.full_text))
+                    remove_media(mainStatus.full_text),len(mention.entities["user_mentions"])-2)
+#                status=remove_media(mainStatus.full_text)
                 img = json.loads(get_image())
                 desc = ' by ' + img['user']['username'] + \
-                    ' unsplash ' + img['links']['html']
+                    ' from unsplash ' + img['links']['html']
                 print(desc)
                 try:
                     upload(img)
